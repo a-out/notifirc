@@ -1,10 +1,13 @@
 import redis
 
-from notifirc.listeners import FileListener   
+from notifirc.listeners import FileListener
+from notifirc.publisher import RedisPublisher
 
 
 file_listener = FileListener(
     'ubuntu',
-    redis.StrictRedis(host='localhost', port=6379),
+    RedisPublisher(
+        redis.StrictRedis(host='localhost', port=6379)
+    ),
     '../data/ubuntu_5_01_15.txt')
 file_listener.listen()

@@ -16,10 +16,7 @@ class Listener(object):
         raise NotImplementedError()
 
     def send(self, channel, msg_id, nick, msg):
-        self.rdis.publish(
-            'notifirc-messages',
-            encode_msg(channel, msg_id, nick, msg)
-        )
+        raise NotImplementedError()
 
 
 class FileListener(Listener):
@@ -27,9 +24,9 @@ class FileListener(Listener):
         'Listen' for messages in a file. Used for integration testing.
     """
 
-    def __init__(self, channel, rdis, filename):
+    def __init__(self, channel, publisher, filename):
         self.channel = channel
-        self.rdis = rdis
+        self.publisher = publisher
         self.file = open(filename, 'r', encoding='utf-8')
         self.msg_id = 0
 
@@ -40,3 +37,6 @@ class FileListener(Listener):
             self.msg_id += 1
             print(msg)
             sleep(0.1)
+
+    def send(self, channel, msg_id, nick, msg):
+        self.publisher.publish(encode_msg(channel, msg_id, nick, msg))
