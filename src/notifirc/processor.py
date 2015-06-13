@@ -14,7 +14,7 @@ def get_context(msg_store, channel, msg_id, m_after=5, m_before=2):
     msg_ids = list(range(msg_id - m_before, msg_id + m_after))
     return msg_store.get_messages(channel, msg_ids)
 
-def process_messages(msg_store, sub, filters):
+def process_messages(msg_store, sub, filters, match_writer):
     last_msg = 0
     for m in sub.listen():
         msg_data = m['data']
