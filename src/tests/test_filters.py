@@ -2,6 +2,7 @@ from nose.tools import assert_true, assert_false
 
 from notifirc.filters import contains, starts_with
 
+
 def test_contains_detects_word_in_middle():
     msg = 'hello everyone, how is it going?'
     assert_true(contains(msg, 'how'))

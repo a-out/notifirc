@@ -1,7 +1,6 @@
 from time import sleep
 import re
-import pickle
-from utils import encode_msg
+from notifirc.utils import encode_msg
 
 
 class Listener(object):
@@ -31,8 +30,7 @@ class FileListener(Listener):
     def __init__(self, channel, rdis, filename):
         self.channel = channel
         self.rdis = rdis
-        self.filename = filename
-        self.file = open(filename, 'r')
+        self.file = open(filename, 'r', encoding='utf-8')
         self.msg_id = 0
 
     def listen(self):
