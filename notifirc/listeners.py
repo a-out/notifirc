@@ -1,6 +1,7 @@
 from time import sleep
 import re
 import pickle
+from utils import encode_msg
 
 
 class Listener(object):
@@ -17,14 +18,9 @@ class Listener(object):
 
     def send(self, channel, msg_id, nick, msg):
         self.rdis.publish(
-            self.channel,
-            pickle.dumps({
-                'id': msg_id,
-                'channel': self.channel,
-                'nick': nick,
-                'msg': msg
-            }
-        ))
+            'notifirc-messages',
+            encode_msg(channel, msg_id, nick, msg)
+        )
 
 
 class FileListener(Listener):
@@ -32,7 +28,7 @@ class FileListener(Listener):
         'Listen' for messages in a file. Used for integration testing.
     """
 
-    def __init__(self, channel, rdis, filename, filters):
+    def __init__(self, channel, rdis, filename):
         self.channel = channel
         self.rdis = rdis
         self.filename = filename
@@ -44,4 +40,5 @@ class FileListener(Listener):
             time, nick, msg = re.match(r'(\[.*\]) <(.*)> (.*)', line).groups()
             self.send(self.channel, self.msg_id, nick, msg)
             self.msg_id += 1
+            print(msg)
             sleep(0.1)
