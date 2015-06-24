@@ -33,5 +33,6 @@ def process_messages(msg_store, sub, filters, match_writer):
             matches = check_matches(msg_to_check['msg'], filters)
             if len(matches) > 0:
                 match_writer.save(
+                    matches,
                     get_context(
                         msg_store, msg_to_check['channel'], msg_to_check['id']))

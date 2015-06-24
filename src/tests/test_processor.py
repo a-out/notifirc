@@ -83,4 +83,4 @@ def test_process_messages_detects_match():
     m_writer.save = MagicMock()
 
     process_messages(msg_store, sub, FILTS, m_writer)
-    m_writer.save.assert_called_with(msgs)
+    m_writer.save.assert_called_with([0], msgs)
