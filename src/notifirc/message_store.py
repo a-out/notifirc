@@ -4,7 +4,7 @@ from notifirc.utils import decode_msg
 class MessageStore(object):
 
     def _key_name(self, channel, msg_id):
-        return "notifirc_{}_{}".format(channel, msg_id)        
+        return "notifirc_{}_{}".format(channel, msg_id)
 
     def get_message(self, channel, msg_id):
         raise NotImplementedError()

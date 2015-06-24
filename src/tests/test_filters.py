@@ -1,6 +1,6 @@
 from nose.tools import assert_true, assert_false
 
-from notifirc.filters import contains, starts_with
+from notifirc.filters import contains
 
 
 def test_contains_detects_word_in_middle():

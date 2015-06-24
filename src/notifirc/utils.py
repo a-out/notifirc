@@ -1,5 +1,6 @@
 import pickle
 
+
 def decode_msg(data):
     if data is None:
         return None
@@ -12,6 +13,7 @@ def decode_msg(data):
         'msg': m['msg']
     }
 
+
 def encode_msg(channel, msg_id, nick, msg):
     return pickle.dumps({
         'id': msg_id,
@@ -19,3 +21,7 @@ def encode_msg(channel, msg_id, nick, msg):
         'nick': nick,
         'msg': msg
     })
+
+
+def zero_min(n):
+    return 0 if n < 0 else n
