@@ -1,7 +1,11 @@
-from nose.tools import assert_true, assert_false
+from nose.tools import assert_true, assert_false, assert_equals
 
-from notifirc.filters import contains
+from notifirc.filters import contains, create_filter
 
+def test_create_filter():
+    f = create_filter(0, 'starts_with', 'meow')
+    assert_equals(f['id'], 0)
+    assert_equals(f['func']('meow hiss'), True)
 
 def test_contains_detects_word_in_middle():
     msg = 'hello everyone, how is it going?'
