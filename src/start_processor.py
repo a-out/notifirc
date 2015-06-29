@@ -11,7 +11,7 @@ from notifirc.match_writer import PostgresMatchWriter
 sub = RedisSubscriber(redis.StrictRedis(host='localhost', port=6379))
 m_store = RedisMessageStore(redis.StrictRedis(host='localhost', port=6379))
 filts = [
-    {'id': 1, 'func': partial(contains, phrase='hi')}
+    {'id': 1, 'func': partial(contains, phrase='django')}
 ]
 
 db_conn = psycopg2.connect("dbname=notifirc user=richard")
