@@ -5,12 +5,12 @@ from notifirc.processor import process_messages
 from notifirc.message_store import MessageStore
 from notifirc.subscriber import Subscriber
 from notifirc.utils import encode_msg, decode_msg
-from notifirc.filters import contains
+from notifirc.filters import create_filter
 from notifirc.match_writer import MatchWriter
 
 
 FILTS = [
-    {'id': 0, 'func': partial(contains, phrase='hi')}
+    create_filter(0, 'contains', 'hi')
 ]
 
 

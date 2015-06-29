@@ -1,6 +1,7 @@
 from nose.tools import assert_equals
+from unittest.mock import MagicMock
 
-from notifirc.utils import parse_irc_msg
+from notifirc.utils import parse_irc_msg, read_nicks
 
 
 def test_can_parse_ping_message():
@@ -22,3 +23,11 @@ def test_can_parse_long_privmsg():
     parsed = parse_irc_msg(msg_info + msg_text)
     assert_equals(parsed['data'][0], 'username')
     assert_equals(parsed['data'][1], msg_text.lstrip(':').rstrip('\r\n'))
+
+
+def test_read_nicks():
+    n = ['alex\n', 'brittany\n', 'chris\n', 'debra\n']
+    file = MagicMock()
+    file.readlines = MagicMock(return_value=n)
+    nicks = read_nicks(file)
+    assert_equals(sorted([x.rstrip() for x in n]), sorted(nicks))

@@ -1,5 +1,6 @@
 import pickle
 import re
+from random import shuffle
 
 
 def decode_msg(data):
@@ -45,3 +46,9 @@ def parse_irc_msg(s):
             m_type = 'NOTICE_IDENTIFIED'
 
     return {'type': m_type, 'data': m_data}
+
+
+def read_nicks(nick_file):
+    nicks = [l.rstrip() for l in nick_file.readlines()]
+    shuffle(nicks)
+    return nicks
