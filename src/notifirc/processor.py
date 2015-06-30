@@ -1,6 +1,10 @@
+import logging
+
 from notifirc.utils import decode_msg, zero_min
 
 CONTEXT_AFTER = 5
+
+logger = logging.getLogger(__name__)
 
 
 def check_matches(msg, filters):
@@ -19,11 +23,16 @@ def get_context(msg_store, channel, msg_id, m_after=5, m_before=2):
 
 
 def process_messages(msg_store, sub, filters, match_writer):
+
+    logger.info("started processor")
     last_msg = 0
+
     for m in sub.listen():
         msg_data = m['data']
         msg = decode_msg(msg_data)
         last_msg = msg['id']
+
+        logger.info(msg['msg'])
 
         msg_store.save_message(msg['channel'], msg['id'], msg_data)
 

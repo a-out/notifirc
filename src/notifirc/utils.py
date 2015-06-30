@@ -33,6 +33,10 @@ def parse_irc_msg(s):
     split = s.split(' ')
     m_type, m_data = '', ''
 
+    if len(split) < 2:
+        print("irregular string: " + s)
+        return {'type': '', 'data': s}
+
     if split[0] == 'PING':
         m_type = 'PING'
         # return hostname, without preceding colon
@@ -44,6 +48,12 @@ def parse_irc_msg(s):
     elif split[1] == 'NOTICE':
         if 'You are now identified' in s:
             m_type = 'NOTICE_IDENTIFIED'
+    elif split[0] == 'ERROR':
+        if 'Connection timed out' in s:
+            m_type = 'ERROR_TIMEOUT'
+    else:
+        if 'End of /NAMES list' in s:
+            m_type = 'JOINED_CHANNEL'
 
     return {'type': m_type, 'data': m_data}
 

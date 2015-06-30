@@ -1,8 +1,7 @@
 from time import sleep
 import re
 import socket
-
-from pprint import pprint
+import logging
 
 from notifirc.utils import encode_msg, parse_irc_msg
 
@@ -57,6 +56,7 @@ class IrcListener(Listener):
         self.publisher = publisher
         self.sock = socket.socket()
         self.msg_id = 0
+        self.logger = logging.getLogger(__name__)
 
     def listen(self):
         self.sock.connect((self.hostname, 6667))
@@ -71,6 +71,8 @@ class IrcListener(Listener):
 
         self.send_irc("JOIN #" + self.channel)
 
+        self.logger.info("Joined #" + self.channel)
+
         while True:
             msg = self.receive()
 
@@ -81,9 +83,11 @@ class IrcListener(Listener):
                 self.msg_id += 1
 
     def receive(self):
-        buff = self.sock.recv(4096).decode('UTF-8')
-        pprint(buff)
-        return parse_irc_msg(buff)
+        buff = self.sock.recv(4096).decode('UTF-8').rstrip()
+        parsed = parse_irc_msg(buff)
+        if parsed['type'] in ['PRIVMSG', 'JOINED_CHANNEL', 'ERROR_TIMEOUT']:
+            self.logger.info("{} -> {}".format(self.channel, buff))
+        return parsed
 
     def wait_for(self, msg_type):
         while True:
@@ -91,5 +95,5 @@ class IrcListener(Listener):
             if msg['type'] == msg_type: break
 
     def send_irc(self, cmd):
-        print("sending: " + cmd)
+        self.logger.info("{} <- {}".format(self.channel, cmd))
         self.sock.send("{}\r\n".format(cmd).encode('UTF-8'))

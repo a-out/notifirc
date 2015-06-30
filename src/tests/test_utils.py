@@ -25,6 +25,19 @@ def test_can_parse_long_privmsg():
     assert_equals(parsed['data'][1], msg_text.lstrip(':').rstrip('\r\n'))
 
 
+def test_can_parse_timeout_msg():
+    msg = 'ERROR :Closing Link: c-73-48-106-253.hsd1.fl.comcast.net (Connection timed out)'
+    parsed = parse_irc_msg(msg)
+    assert_equals(parsed['type'], 'ERROR_TIMEOUT')
+
+
+def test_can_parse_message_with_smiley():
+    msg_info = ":username!~user@12345-blah-blahisp.com PRIVMSG #channel :"
+    msg_text = "Here's a console representation of my current facial state :)"
+    parsed = parse_irc_msg(msg_info + msg_text)
+    assert_equals(parsed['data'], ('username', msg_text))
+
+
 def test_read_nicks():
     n = ['alex\n', 'brittany\n', 'chris\n', 'debra\n']
     file = MagicMock()
