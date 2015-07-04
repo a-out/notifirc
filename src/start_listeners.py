@@ -1,36 +1,19 @@
 import redis
-import threading
 import logging
+import asyncio
 
-from notifirc.listeners import IrcListener
+from notifirc.listeners import irc_listen
 from notifirc.publisher import RedisPublisher
-from notifirc.utils import read_nicks
-
-logging.basicConfig(
-    format='[%(levelname)s] %(asctime)s %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S %p',
-    level=logging.DEBUG)
-
-nicks = read_nicks(open('../data/nicks.txt'))
-CHANNELS = [
-    l.rstrip().split(' ') for l in
-    open('../data/channels.txt').readlines()]
-PASSWORD = open('../data/password.txt').read().strip().split(' ')
+from notifirc.utils import read_configs
 
 
-def start(hostname, channel, nick):
-    IrcListener(
-        nick,
-        PASSWORD,
-        hostname,
-        channel,
-        RedisPublisher(redis.StrictRedis(host='localhost', port=6379))
-    ).listen()
+configs = read_configs(
+    open('../data/channels.txt'),
+    open('../data/nicks.txt'),
+    open('../data/creds.txt'))
+pub = RedisPublisher(redis.StrictRedis(host='localhost', port=6379))
+loop = asyncio.get_event_loop()
+tasks = [irc_listen(loop, pub, config) for config in configs]
 
-
-threads = []
-for (host, channel) in CHANNELS:
-    nick = nicks.pop()
-    t = threading.Thread(target=start, args=(host, channel, nick))
-    threads.append(t)
-    t.start()
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
