@@ -48,5 +48,7 @@ def irc_listen(loop, pub, config, ssl=True):
             command, params = unpack_command(data.decode())
             _handle_message(writer, config, pub, msg_id, command, params)
         except ValueError:
-            pass
+            if data == '':
+                writer.close()
+                break
         msg_id += 1
