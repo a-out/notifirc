@@ -34,4 +34,4 @@ class PostgresMatchWriter(MatchWriter):
                     INSERT INTO match_filters (filter_id, match_id)
                     VALUES (%s, %s)
                 """, (f_id, match_id))
-        conn.commit()
+        self.conn.commit()
