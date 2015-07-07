@@ -16,7 +16,7 @@ logging.basicConfig(
 
 sub = RedisSubscriber(redis.StrictRedis(host='localhost', port=6379))
 m_store = RedisMessageStore(redis.StrictRedis(host='localhost', port=6379))
-db_conn = psycopg2.connect("dbname=notifirc user=richard")
+db_conn = psycopg2.connect(open('../data/db_uri.txt', 'r').read().rstrip())
 filters = initialize_filters(db_conn)
 m_writer = PostgresMatchWriter(db_conn)
 
