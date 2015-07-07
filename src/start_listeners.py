@@ -14,8 +14,6 @@ configs = read_configs(
 pub = RedisPublisher(redis.StrictRedis(host='localhost', port=6379))
 loop = asyncio.get_event_loop()
 
-# run tasks until one completes (times out). when one fails, restart all
-while True:
-    tasks = [irc_listen(loop, pub, config, ssl=False) for config in configs]
-    loop.run_until_complete(asyncio.wait(tasks, return_when=FIRST_COMPLETED))
+tasks = [irc_listen(loop, pub, config) for config in configs]
+loop.run_until_complete(asyncio.wait(tasks))
 loop.close()
