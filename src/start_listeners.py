@@ -1,6 +1,5 @@
 import redis
 import asyncio
-from concurrent.futures import FIRST_COMPLETED
 
 from notifirc.listeners import irc_listen
 from notifirc.publisher import RedisPublisher
@@ -14,6 +13,6 @@ configs = read_configs(
 pub = RedisPublisher(redis.StrictRedis(host='localhost', port=6379))
 loop = asyncio.get_event_loop()
 
-tasks = [irc_listen(loop, pub, config) for config in configs]
+tasks = [irc_listen(loop, pub, config, ssl=False) for config in configs]
 loop.run_until_complete(asyncio.wait(tasks))
 loop.close()

@@ -1,6 +1,7 @@
 import logging
 
-from notifirc.utils import decode_msg, zero_min
+from notifirc.utils import zero_min
+from notifirc.message import Message
 
 CONTEXT_AFTER = 5
 
@@ -29,23 +30,23 @@ def process_messages(msg_store, sub, filters, match_writer):
 
     for m in sub.listen():
         msg_data = m['data']
-        msg = decode_msg(msg_data)
-        last_msg = msg['id']
+        msg = Message.decode(msg_data)
+        last_msg = msg.msg_id
 
-        logger.info(msg['msg'])
+        logger.info(msg.text)
 
-        msg_store.save_message(msg['channel'], msg['id'], msg_data)
+        msg_store.save_message(msg)
 
         # check msg from the past, so we have some
         # context for our matches
-        msg_to_check = msg_store.get_message(msg['channel'], last_msg - 5)
+        msg_to_check = msg_store.get_message(msg.channel, last_msg - 5)
 
         if msg_to_check:
-            matches = check_matches(msg_to_check['msg'], filters)
+            matches = check_matches(msg_to_check.text, filters)
             if len(matches) > 0:
                 match_context = get_context(
-                    msg_store, msg_to_check['channel'], msg_to_check['id'])
+                    msg_store, msg_to_check.channel, msg_to_check.msg_id)
                 match_writer.save(
-                    msg['channel'],
+                    msg_to_check.channel,
                     matches,
                     match_context)

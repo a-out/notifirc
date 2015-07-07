@@ -1,4 +1,4 @@
-from notifirc.utils import decode_msg
+from notifirc.message import Message
 
 
 class MessageStore(object):
@@ -23,17 +23,17 @@ class RedisMessageStore(MessageStore):
 
     def get_message(self, channel, msg_id):
         msg_key = self._key_name(channel, msg_id)
-        msg_data = self.rdis.get(msg_key)
-        return decode_msg(msg_data)
+        mdict = self.rdis.hgetall(msg_key)
+        return Message.from_dict(mdict)
 
     def get_messages(self, channel, msg_ids):
         pipe = self.rdis.pipeline()
 
         for msg_id in msg_ids:
             msg_key = self._key_name(channel, msg_id)
-            pipe.get(msg_key)
-        return [decode_msg(data) for data in pipe.execute()]
+            pipe.hgetall(msg_key)
+        return [Message.from_dict(d) for d in pipe.execute()]
 
-    def save_message(self, channel, msg_id, data):
-        msg_key = self._key_name(channel, msg_id)
-        self.rdis.set(msg_key, data)
+    def save_message(self, msg):
+        msg_key = self._key_name(msg.channel, msg.msg_id)
+        self.rdis.hmset(msg_key, msg.to_dict())

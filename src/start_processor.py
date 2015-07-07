@@ -1,5 +1,4 @@
 import redis
-from functools import partial
 import psycopg2
 import logging
 

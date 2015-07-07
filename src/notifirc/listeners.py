@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 
 from . unpack import unpack_command
-from . utils import encode_msg
+from . message import Message
 
 
 TIMEOUT = 300
@@ -34,9 +34,8 @@ def _handle_message(writer, config, pub, msg_id, command, params):
         logger.info("[{}] {} -> {}".format(
             config['channel'], params['nick'], params['message']
         ))
-        pub.publish(encode_msg(
-            config['channel'], msg_id, params['nick'], params['message']
-        ))
+        m = Message(msg_id, config['channel'], params['nick'], params['message'])
+        pub.publish(m.encode())
     elif command == 'PING':
         _send(writer, "PONG " + params['message'])
         logger.info("[{}] PONG {}".format(config['channel'], params['message']))
