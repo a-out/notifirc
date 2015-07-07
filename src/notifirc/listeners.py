@@ -39,7 +39,7 @@ def _handle_message(writer, config, pub, msg_id, command, params):
         ))
     elif command == 'PING':
         _send(writer, "PONG " + params['message'])
-        logger.info("PONG " + params['message'])
+        logger.info("[{}] PONG {}".format(config['channel'], params['message']))
     elif command == 'JOIN' and params['nick'] == config['nick']:
         logger.info("JOINED " + config['channel'])
 
