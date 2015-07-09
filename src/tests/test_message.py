@@ -11,6 +11,21 @@ def test_message_constructor():
     assert_equal(msg.text, 'message text')
 
 
+def test_message_from_dict():
+    mdict = {
+        'msg_id': 1,
+        'channel': '#myChannel',
+        'nick': 'Me',
+        'text': 'This is my message'
+    }
+
+    m = Message.from_dict(mdict)
+    assert_equal(m.msg_id, 1)
+    assert_equal(m.channel, '#myChannel')
+    assert_equal(m.nick, 'Me')
+    assert_equal(m.text, 'This is my message')
+
+
 def test_message_to_and_from_dict_completeness():
     m = Message(0, 'mychannel', 'rth', 'message text')
 

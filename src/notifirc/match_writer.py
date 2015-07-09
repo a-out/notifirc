@@ -10,11 +10,11 @@ class PostgresMatchWriter(MatchWriter):
     def __init__(self, conn):
         self.conn = conn
 
-    def _serialize(self, d):
-        return json.dumps(d)
+    def _serialize(self, matches):
+        dicts = [m.__dict__ for m in matches if m is not None]
+        return json.dumps(dicts)
 
     def save(self, channel, filter_ids, matches):
-
         ms_serialized = self._serialize(matches)
 
         with self.conn.cursor() as cursor:

@@ -10,7 +10,7 @@ class Message(object):
     @classmethod
     def from_dict(cls, d):
         try:
-            return cls(d['msg_id'], d['channel'], d['nick'], d['text'])
+            return cls(int(d['msg_id']), d['channel'], d['nick'], d['text'])
         except KeyError:
             return None
 
