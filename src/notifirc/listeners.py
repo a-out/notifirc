@@ -1,7 +1,6 @@
 import asyncio
 from pprint import pprint
 import logging
-from datetime import datetime
 
 from . unpack import unpack_command
 from . message import Message
@@ -12,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def _send(writer, msg):
+    logger.info(msg)
     data = msg + "\r\n"
     writer.write(data.encode())
 
@@ -23,6 +23,8 @@ def _irc_initialize(writer, config, nickserv=True):
         _send(writer,
               "NICKSERV identify {} {}".format(
                 config['creds'][0], config['creds'][1]))
+    else:
+        _join(writer, config)
 
 
 def _join(writer, config):
@@ -41,6 +43,10 @@ def _handle_message(writer, config, pub, msg_id, command, params):
         logger.info("[{}] PONG {}".format(config['channel'], params['message']))
     elif command == 'JOIN' and params['nick'] == config['nick']:
         logger.info("JOINED " + config['channel'])
+    elif command == 'NOTICE' and params.get('nick') == 'NickServ':
+        if 'identified' in params['message']:
+            logger.info("IDENTIFIED")
+            _join(writer, config)
 
 
 @asyncio.coroutine
@@ -48,19 +54,21 @@ def irc_listen(loop, pub, config, ssl=True):
     msg_id = 0
     reader, writer = yield from asyncio.open_connection(
         config['host'], config['port'], loop=loop, ssl=ssl)
-
     _irc_initialize(writer, config)
-    _join(writer, config)
 
     while True:
+        # read message
         try:
             fut = reader.read(4096)
             # wait up to TIMEOUT seconds to read new msg from socket
             data = yield from asyncio.wait_for(fut, timeout=TIMEOUT)
         except asyncio.TimeoutError:
             logger.info("[{}] TIMEOUT".format(config['channel']))
-            break
+            reader, writer = yield from asyncio.open_connection(
+                config['host'], config['port'], loop=loop, ssl=ssl)
+            _irc_initialize(writer, config)
 
+        # parse / handle message
         try:
             command, params = unpack_command(data.decode())
             _handle_message(writer, config, pub, msg_id, command, params)
@@ -69,5 +77,5 @@ def irc_listen(loop, pub, config, ssl=True):
             pass
         msg_id += 1
 
-    logger.info("[{}] COMPLETED".format(config['channel']))
+    logger.info("[{}] CONNECTION CLOSED".format(config['channel']))
     writer.close()

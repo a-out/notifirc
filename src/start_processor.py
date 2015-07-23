@@ -13,7 +13,13 @@ logging.basicConfig(
     datefmt='%m/%d/%Y %I:%M:%S %p',
     level=logging.DEBUG)
 
-sub = RedisSubscriber(redis.StrictRedis(host='localhost', port=6379))
+
+def create_redis():
+    return redis.StrictRedis(host='localhost', port=6379)
+
+
+create_redis().flushall()
+sub = RedisSubscriber(create_redis())
 m_store = RedisMessageStore(
         redis.StrictRedis(host='localhost', port=6379, decode_responses=True))
 db_conn = psycopg2.connect(open('../data/db_uri.txt', 'r').read().rstrip())
