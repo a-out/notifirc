@@ -52,6 +52,7 @@ def _handle_message(writer, config, pub, msg_id, command, params):
 @asyncio.coroutine
 def irc_listen(loop, pub, config):
     msg_id = 0
+    dump_file = open('../dump.txt', 'w')
     reader, writer = yield from asyncio.open_connection(
         config['host'], config['port'], loop=loop, ssl=config['ssl'])
     _irc_initialize(writer, config)
@@ -71,6 +72,7 @@ def irc_listen(loop, pub, config):
 
         # parse / handle message
         try:
+            dump_file.write(data.decode())
             command, params = unpack_command(data.decode())
             _handle_message(writer, config, pub, msg_id, command, params)
         except ValueError:
@@ -80,3 +82,4 @@ def irc_listen(loop, pub, config):
 
     logger.info("[{}] CONNECTION CLOSED".format(config['channel']))
     writer.close()
+    dump_file.close()
