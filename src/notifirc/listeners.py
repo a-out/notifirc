@@ -16,10 +16,10 @@ def _send(writer, msg):
     writer.write(data.encode())
 
 
-def _irc_initialize(writer, config, nickserv=True):
+def _irc_initialize(writer, config):
     _send(writer, "USER {} 8 * :{}".format(config['nick'], config['nick']))
     _send(writer, "NICK " + config['nick'])
-    if nickserv:
+    if config['nickserv']:
         _send(writer,
               "NICKSERV identify {} {}".format(
                 config['creds'][0], config['creds'][1]))
@@ -50,10 +50,10 @@ def _handle_message(writer, config, pub, msg_id, command, params):
 
 
 @asyncio.coroutine
-def irc_listen(loop, pub, config, ssl=True):
+def irc_listen(loop, pub, config):
     msg_id = 0
     reader, writer = yield from asyncio.open_connection(
-        config['host'], config['port'], loop=loop, ssl=ssl)
+        config['host'], config['port'], loop=loop, ssl=config['ssl'])
     _irc_initialize(writer, config)
 
     while True:
@@ -65,8 +65,9 @@ def irc_listen(loop, pub, config, ssl=True):
         except asyncio.TimeoutError:
             logger.info("[{}] TIMEOUT".format(config['channel']))
             reader, writer = yield from asyncio.open_connection(
-                config['host'], config['port'], loop=loop, ssl=ssl)
+                config['host'], config['port'], loop=loop, ssl=config['ssl'])
             _irc_initialize(writer, config)
+            continue
 
         # parse / handle message
         try:

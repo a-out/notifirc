@@ -15,7 +15,8 @@ def read_configs(config_file, nicks_file, creds_file):
     nicks = read_nicks(nicks_file)
     channels = [
         l.rstrip().split(' ') for l in
-        config_file.readlines()]
+        config_file.readlines()
+        if l[0] != '#']
     creds = creds_file.read().rstrip().split(' ')
 
     return [
@@ -23,8 +24,10 @@ def read_configs(config_file, nicks_file, creds_file):
             'host': host,
             'port': port,
             'channel': channel,
+            'nickserv': nickserv == 'True',
+            'ssl': ssl == 'True',
             'nick': nicks.pop(),
             'creds': creds
         }
-        for (host, port, channel) in channels
+        for (host, port, channel, nickserv, ssl) in channels
     ]
