@@ -14,4 +14,5 @@ from . import utils
 logging.basicConfig(
     format='[%(levelname)s] %(asctime)s %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p',
+    filename='notifirc.log',
     level=logging.DEBUG)

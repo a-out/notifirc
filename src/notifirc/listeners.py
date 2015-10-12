@@ -53,11 +53,17 @@ def _handle_message(writer, config, pub, msg_id, command, params):
 def irc_listen(loop, pub, config):
     msg_id = 0
     dump_file = open('../dump.txt', 'w')
-    reader, writer = yield from asyncio.open_connection(
-        config['host'], config['port'], loop=loop, ssl=config['ssl'])
-    _irc_initialize(writer, config)
+    reader, writer = None, None
 
     while True:
+
+        # connect or reconnect if necessary
+        if reader is None or reader.at_eof():
+            logger.info("CONNECTING to {}".format(config['channel']))
+            reader, writer = yield from asyncio.open_connection(
+                config['host'], config['port'], loop=loop, ssl=config['ssl'])
+            _irc_initialize(writer, config)
+
         # read message
         try:
             fut = reader.read(4096)
@@ -70,7 +76,7 @@ def irc_listen(loop, pub, config):
             _irc_initialize(writer, config)
             continue
 
-        # parse / handle message
+        # parse and handle message
         try:
             dump_file.write(data.decode())
             command, params = unpack_command(data.decode())
